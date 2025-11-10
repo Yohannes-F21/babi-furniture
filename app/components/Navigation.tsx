@@ -11,6 +11,7 @@ export default function Navigation() {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
+  const [pastHero, setPastHero] = useState(false);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -36,7 +37,7 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+    <nav className={`fixed top-0 left-0 right-0 bg-white shadow-md z-50 `}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}

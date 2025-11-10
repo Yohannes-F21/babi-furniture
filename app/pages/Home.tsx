@@ -46,7 +46,10 @@ export default function Home() {
   return (
     <div className="pt-16">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-amber-50 to-orange-50 py-20 overflow-hidden">
+      <section
+        id="hero"
+        className="relative bg-gradient-to-r from-amber-50 to-orange-50 py-20 overflow-hidden"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
