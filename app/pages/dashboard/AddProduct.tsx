@@ -33,13 +33,6 @@ export default function AddProduct() {
     formState: { errors, isSubmitting },
   } = useForm<ProductFormData>();
 
-  // useEffect(() => {
-  //   // const user = localStorage.getItem("user");
-  //   if (!isAuthenticated) {
-  //     router.push("/login");
-  //   }
-  // }, [router]);
-
   const onSubmit = async (data: ProductFormData) => {
     try {
       // Simulate API call
@@ -60,7 +53,7 @@ export default function AddProduct() {
           onClose={() => setToast(null)}
         />
       )}
-      <DashboardSidebar />
+      {/* <DashboardSidebar /> */}
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8">

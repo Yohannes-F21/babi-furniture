@@ -73,7 +73,7 @@ export default function EditProduct() {
           onClose={() => setToast(null)}
         />
       )}
-      <DashboardSidebar />
+      {/* <DashboardSidebar /> */}
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8">

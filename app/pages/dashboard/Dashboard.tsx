@@ -16,31 +16,31 @@ export default function Dashboard() {
   // const auth = useSelector((state: RootState) => state.auth);
   // console.log(auth);
 
-  useEffect(() => {
-    if (!isLoading && (!isAuthenticated || isLoggedOut)) {
-      router.replace("/login");
-    }
-  }, [isAuthenticated, isLoggedOut, isLoading, router]);
+  // useEffect(() => {
+  //   if (!isLoading && (!isAuthenticated || isLoggedOut)) {
+  //     router.replace("/login");
+  //   }
+  // }, [isAuthenticated, isLoggedOut, isLoading, router]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Checking session...
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       Checking session...
+  //     </div>
+  //   );
+  // }
 
-  if (!isAuthenticated || isLoggedOut) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Redirecting...
-      </div>
-    );
-  }
+  // if (!isAuthenticated || isLoggedOut) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       Redirecting...
+  //     </div>
+  //   );
+  // } // add dashboard layout and protected route middleware
 
   return (
     <div className="flex min-h-screen bg-gray-50 pt-16">
-      <DashboardSidebar />
+      {/* <DashboardSidebar /> */}
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8">

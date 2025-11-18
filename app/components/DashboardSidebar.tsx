@@ -30,8 +30,9 @@ export default function DashboardSidebar() {
     }
   }, []);
 
-  const isActive = (path: string) =>
-    pathname === path || pathname.startsWith(`${path}/`);
+  // const isActive = (path: string) =>
+  //   pathname === path || pathname.startsWith(`${path}/`);
+  // const isActive = (path: string) => pathname.startsWith(path);
 
   const menuItems = [
     { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -44,12 +45,12 @@ export default function DashboardSidebar() {
     },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    setUser(null);
-    router.push("/");
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("user");
+  //   localStorage.removeItem("token");
+  //   setUser(null);
+  //   router.push("/");
+  // };
 
   return (
     <>
@@ -86,22 +87,25 @@ export default function DashboardSidebar() {
           <nav className="flex-1 space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
+              const isActive =
+                // Exact match for /dashboard
+                (item.path === "/dashboard" && pathname === "/dashboard") ||
+                // For all other routes: check if current path starts with path
+                (item.path !== "/dashboard" && pathname.startsWith(item.path));
               return (
                 <Link
                   key={item.path}
                   href={item.path}
                   onClick={() => setIsOpen(false)}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${
-                    isActive(item.path)
+                    isActive
                       ? "bg-amber-600 text-white"
                       : "text-gray-300 hover:bg-gray-800 hover:text-white"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
                   <span className="font-medium">{item.label}</span>
-                  {isActive(item.path) && (
-                    <ChevronRight className="ml-auto w-4 h-4" />
-                  )}
+                  {isActive && <ChevronRight className="ml-auto w-4 h-4" />}
                 </Link>
               );
             })}
@@ -109,7 +113,7 @@ export default function DashboardSidebar() {
 
           {/* Logout Button */}
           <button
-            onClick={handleLogout}
+            // onClick={handleLogout}
             className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors duration-200 font-medium"
           >
             <LogOut className="w-5 h-5" />
