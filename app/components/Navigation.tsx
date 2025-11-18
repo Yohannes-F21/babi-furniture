@@ -4,21 +4,21 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Menu, X, LogOut, User } from "lucide-react";
-
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/app/store/store";
+import { logout, logoutUser } from "@/app/store/authSlice";
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+
   const pathname = usePathname();
-  const [user, setUser] = useState<any>(null);
+  // const [user, setUser] = useState<any>(null);
   const [pastHero, setPastHero] = useState(false);
 
-  useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, []);
+  const { user } = useSelector((state: RootState) => state.auth);
+  // console.log(user);
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -28,12 +28,20 @@ export default function Navigation() {
     { name: "Contact Us", path: "/contact" },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    setUser(null);
+  const handleLogout = async () => {
+    // 1. Clear state immediately
+    dispatch(logout());
     setIsUserMenuOpen(false);
-    router.push("/");
+
+    // 2. Redirect immediately
+    router.push("/login");
+
+    // 3. Call backend (can fail — already logged out)
+    try {
+      await dispatch(logoutUser());
+    } catch (err) {
+      console.warn("Backend logout failed, but user is already logged out");
+    }
   };
 
   return (
@@ -71,7 +79,7 @@ export default function Navigation() {
                   className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
                 >
                   <User className="w-4 h-4" />
-                  <span className="font-semibold text-sm">{user.name}</span>
+                  <span className="font-semibold text-sm">{user.userName}</span>
                 </button>
 
                 {isUserMenuOpen && (

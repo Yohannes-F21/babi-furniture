@@ -7,6 +7,9 @@ import DashboardSidebar from "@/app/components/DashboardSidebar";
 import { ChevronLeft, Upload } from "lucide-react";
 import Toast from "@/app/components/Toast";
 
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/app/store/store";
+
 interface ProductFormData {
   title: string;
   category: string;
@@ -18,6 +21,7 @@ interface ProductFormData {
 
 export default function AddProduct() {
   const router = useRouter();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [toast, setToast] = useState<{
     type: "success" | "error";
     message: string;
@@ -29,12 +33,12 @@ export default function AddProduct() {
     formState: { errors, isSubmitting },
   } = useForm<ProductFormData>();
 
-  useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (!user) {
-      router.push("/login");
-    }
-  }, [router]);
+  // useEffect(() => {
+  //   // const user = localStorage.getItem("user");
+  //   if (!isAuthenticated) {
+  //     router.push("/login");
+  //   }
+  // }, [router]);
 
   const onSubmit = async (data: ProductFormData) => {
     try {
@@ -56,7 +60,7 @@ export default function AddProduct() {
           onClose={() => setToast(null)}
         />
       )}
-      <DashboardSidebar activePath="/dashboard/products/add" />
+      <DashboardSidebar />
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8">

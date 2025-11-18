@@ -1,53 +1,83 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import DashboardSidebar from "@/app/components/DashboardSidebar"
-import { Edit, Trash2, Plus, Search } from "lucide-react"
-import Toast from "@/app/components/Toast"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import DashboardSidebar from "@/app/components/DashboardSidebar";
+import { Edit, Trash2, Plus, Search } from "lucide-react";
+import Toast from "@/app/components/Toast";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/app/store/store";
 
 interface Product {
-  id: string
-  title: string
-  price: number
-  category: string
-  status: "active" | "inactive"
+  id: string;
+  title: string;
+  price: number;
+  category: string;
+  status: "active" | "inactive";
 }
 
 export default function DashboardProducts() {
-  const router = useRouter()
+  const router = useRouter();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [products, setProducts] = useState<Product[]>([
-    { id: "1", title: "Sofa M115", price: 94900, category: "Sofa", status: "active" },
-    { id: "2", title: "Bed B205", price: 67500, category: "Bed", status: "active" },
-    { id: "3", title: "Dining Set D340", price: 125800, category: "Dining Set", status: "active" },
-  ])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null)
+    {
+      id: "1",
+      title: "Sofa M115",
+      price: 94900,
+      category: "Sofa",
+      status: "active",
+    },
+    {
+      id: "2",
+      title: "Bed B205",
+      price: 67500,
+      category: "Bed",
+      status: "active",
+    },
+    {
+      id: "3",
+      title: "Dining Set D340",
+      price: 125800,
+      category: "Dining Set",
+      status: "active",
+    },
+  ]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [toast, setToast] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
-    const user = localStorage.getItem("user")
-    if (!user) {
-      router.push("/login")
+    // const user = localStorage.getItem("user");
+    if (!isAuthenticated) {
+      router.push("/login");
     }
-  }, [router])
+  }, [router]);
 
   const handleDelete = (id: string) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      setProducts(products.filter((p) => p.id !== id))
-      setToast({ type: "success", message: "Product deleted successfully" })
+      setProducts(products.filter((p) => p.id !== id));
+      setToast({ type: "success", message: "Product deleted successfully" });
     }
-  }
+  };
 
   const filteredProducts = products.filter(
     (product) =>
       product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      product.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="flex min-h-screen bg-gray-50 pt-16">
-      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
-      <DashboardSidebar activePath="/dashboard/products" />
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
+      <DashboardSidebar />
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8">
@@ -56,7 +86,9 @@ export default function DashboardProducts() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-              <p className="text-gray-600 mt-1">Manage your furniture collection</p>
+              <p className="text-gray-600 mt-1">
+                Manage your furniture collection
+              </p>
             </div>
             <button
               onClick={() => router.push("/dashboard/products/add")}
@@ -97,23 +129,44 @@ export default function DashboardProducts() {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Title</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Category</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Price</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                        Title
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                        Category
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                        Price
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
                     {filteredProducts.map((product) => (
-                      <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-sm text-gray-900 font-medium">{product.title}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
-                        <td className="px-6 py-4 text-sm font-semibold text-amber-600">{product.price} Br</td>
+                      <tr
+                        key={product.id}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                          {product.title}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {product.category}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-semibold text-amber-600">
+                          {product.price} Br
+                        </td>
                         <td className="px-6 py-4 text-sm">
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              product.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                              product.status === "active"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
                             }`}
                           >
                             {product.status}
@@ -121,7 +174,11 @@ export default function DashboardProducts() {
                         </td>
                         <td className="px-6 py-4 text-sm space-x-2 flex">
                           <button
-                            onClick={() => router.push(`/dashboard/products/edit/${product.id}`)}
+                            onClick={() =>
+                              router.push(
+                                `/dashboard/products/edit/${product.id}`
+                              )
+                            }
                             className="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
                           >
                             <Edit className="w-4 h-4" />
@@ -143,5 +200,5 @@ export default function DashboardProducts() {
         </div>
       </main>
     </div>
-  )
+  );
 }

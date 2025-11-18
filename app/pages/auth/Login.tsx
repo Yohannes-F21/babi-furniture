@@ -1,22 +1,30 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import Link from "next/link"
-import { Eye, EyeOff, ChevronRight } from "lucide-react"
-import Toast from "@/app/components/Toast"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import Link from "next/link";
+import { Eye, EyeOff, ChevronRight } from "lucide-react";
+import Toast from "@/app/components/Toast";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../store/authSlice";
+import { AppDispatch, RootState } from "../../store/store";
 
 interface LoginFormData {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 export default function Login() {
-  const router = useRouter()
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null)
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [toast, setToast] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
   const {
     register,
@@ -24,29 +32,51 @@ export default function Login() {
     formState: { errors },
   } = useForm<LoginFormData>({
     mode: "onBlur",
-  })
+  });
 
   const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+    // try {
+    //   await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      // Store user data
-      localStorage.setItem("user", JSON.stringify({ name: data.email.split("@")[0], email: data.email }))
-      localStorage.setItem("token", "dummy-token-123")
+    //   // Store user data
+    //   localStorage.setItem("user", JSON.stringify({ name: data.email.split("@")[0], email: data.email }))
+    //   localStorage.setItem("token", "dummy-token-123")
 
-      setToast({ type: "success", message: "Login successful! Redirecting..." })
-      setTimeout(() => router.push("/dashboard"), 1500)
-    } catch (error) {
-      setToast({ type: "error", message: "Login failed. Please try again." })
-    } finally {
-      setIsLoading(false)
+    //   setToast({ type: "success", message: "Login successful! Redirecting..." })
+    //   setTimeout(() => router.push("/dashboard"), 1500)
+    // } catch (error) {
+    //   setToast({ type: "error", message: "Login failed. Please try again." })
+    // } finally {
+
+    // }
+
+    const result = await dispatch(
+      login({ email: data.email, password: data.password })
+    );
+    if (result.meta.requestStatus === "fulfilled") {
+      setToast({
+        type: "success",
+        message: "Login successful! Redirecting...",
+      });
+      router.push("/dashboard");
+    } else {
+      setToast({
+        type: "error",
+        message:
+          (result.payload as string) || "Login failed. Please try again.",
+      });
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center px-4 py-12 pt-24">
-      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
 
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-lg p-8">
@@ -58,7 +88,9 @@ export default function Login() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
               <input
                 {...register("email", {
                   required: "Email is required",
@@ -71,12 +103,18 @@ export default function Login() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent transition-colors"
                 placeholder="Enter your email"
               />
-              {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-red-600 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
               <div className="relative">
                 <input
                   {...register("password", {
@@ -94,12 +132,19 @@ export default function Login() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-red-600 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             {/* Forgot Password Link */}
             <div className="text-right">
-              <Link href="/forgot-password" className="text-amber-600 font-semibold hover:text-amber-700 text-sm">
+              <Link
+                href="/forgot-password"
+                className="text-amber-600 font-semibold hover:text-amber-700 text-sm"
+              >
                 Forgot Password?
               </Link>
             </div>
@@ -117,7 +162,10 @@ export default function Login() {
             {/* Register Link */}
             <p className="text-center text-gray-600">
               Don't have an account?{" "}
-              <Link href="/register" className="text-amber-600 font-semibold hover:text-amber-700">
+              <Link
+                href="/register"
+                className="text-amber-600 font-semibold hover:text-amber-700"
+              >
                 Register
               </Link>
             </p>
@@ -125,5 +173,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  )
+  );
 }
