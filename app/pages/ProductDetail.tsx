@@ -1,16 +1,55 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useParams } from "next/navigation"
-import Link from "next/link"
-import { Star, Truck, Shield, ArrowLeft, Heart, Share2 } from "lucide-react"
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { Star, Truck, Shield, ArrowLeft, Heart, Share2 } from "lucide-react";
+import publicApi from "@/lib/publicApi";
 
 export default function ProductDetail() {
-  const params = useParams()
-  const id = params.id as string
-  const [currentImage, setCurrentImage] = useState(0)
+  const params = useParams();
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const id = params.id as string;
+  console.log(id);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const product = {
+  useEffect(() => {
+    if (!id) return;
+
+    publicApi
+      .get(`/products/get/${id}`)
+      .then((res) => {
+        const data = res.data.data;
+        console.log("Fetched product:", data);
+        setProduct(data);
+        setCurrentImageIndex(0); // Reset to first image
+      })
+      .catch((err) => {
+        console.error("Error:", err);
+        setProduct(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [id]);
+
+  if (loading) return <div className="text-center py-20">Loading...</div>;
+  if (!product)
+    return (
+      <div className="text-center py-20 text-red-600">Product not found</div>
+    );
+
+  // SAFE WAY: Build images array only when product exists
+  const allImages = [
+    product.thumbnailUrl,
+    ...(Array.isArray(product.imagesUrl)
+      ? product.imagesUrl.filter((img: any) => img !== product.thumbnailUrl) // remove duplicate
+      : []),
+  ].filter(Boolean);
+
+  const currentImage = allImages[currentImageIndex] || product.thumbnailUrl;
+  const productLocal = {
     id: 1,
     name: "Sofa M115",
     price: "94,900",
@@ -37,13 +76,28 @@ export default function ProductDetail() {
       Warranty: "2 Years",
       Delivery: "7-10 Days",
     },
-  }
+  };
 
   const relatedProducts = [
-    { id: 2, name: "Sofa S220", price: "78,900", image: "/placeholder.svg?height=200&width=250" },
-    { id: 3, name: "Sofa S190", price: "112,300", image: "/placeholder.svg?height=200&width=250" },
-    { id: 4, name: "Chair C105", price: "25,400", image: "/placeholder.svg?height=200&width=250" },
-  ]
+    {
+      id: 2,
+      name: "Sofa S220",
+      price: "78,900",
+      image: "/placeholder.svg?height=200&width=250",
+    },
+    {
+      id: 3,
+      name: "Sofa S190",
+      price: "112,300",
+      image: "/placeholder.svg?height=200&width=250",
+    },
+    {
+      id: 4,
+      name: "Chair C105",
+      price: "25,400",
+      image: "/placeholder.svg?height=200&width=250",
+    },
+  ];
 
   return (
     <div className="pt-16">
@@ -55,11 +109,14 @@ export default function ProductDetail() {
               Home
             </Link>
             <span className="text-gray-400">/</span>
-            <Link href="/products" className="text-gray-500 hover:text-amber-600">
+            <Link
+              href="/products"
+              className="text-gray-500 hover:text-amber-600"
+            >
               Products
             </Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900">{product.name}</span>
+            <span className="text-gray-900">{product.title}</span>
           </div>
         </div>
       </div>
@@ -67,7 +124,10 @@ export default function ProductDetail() {
       {/* Product Detail */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href="/products" className="inline-flex items-center text-amber-600 hover:text-amber-700 mb-8">
+          <Link
+            href="/products"
+            className="inline-flex items-center text-amber-600 hover:text-amber-700 mb-8"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Products
           </Link>
@@ -77,8 +137,8 @@ export default function ProductDetail() {
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-lg">
                 <img
-                  src={product.images[currentImage] || "/placeholder.svg"}
-                  alt={product.name}
+                  src={currentImage || "/placeholder.svg"}
+                  alt={product.title}
                   className="w-full h-96 object-cover"
                 />
                 <div className="absolute top-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -88,10 +148,10 @@ export default function ProductDetail() {
 
               {/* Thumbnail Gallery */}
               <div className="grid grid-cols-4 gap-4">
-                {product.images.map((image, index) => (
+                {allImages.map((image: any, index: any) => (
                   <button
                     key={index}
-                    onClick={() => setCurrentImage(index)}
+                    onClick={() => setCurrentImageIndex(index)}
                     className={`relative overflow-hidden rounded-lg ${
                       currentImage === index ? "ring-2 ring-amber-600" : ""
                     }`}
@@ -122,27 +182,40 @@ export default function ProductDetail() {
                     </button>
                   </div>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                  {product.title}
+                </h1>
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="flex items-center">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                      <Star
+                        key={i}
+                        className="w-5 h-5 fill-amber-400 text-amber-400"
+                      />
                     ))}
                   </div>
                   <span className="text-gray-600">(24 reviews)</span>
                 </div>
-                <div className="text-4xl font-bold text-amber-600 mb-6">{product.price} Br</div>
+                <div className="text-4xl font-bold text-amber-600 mb-6">
+                  {product.price.toLocaleString()} Br
+                </div>
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Description</h3>
-                <p className="text-gray-600 leading-relaxed">{product.description}</p>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Description
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {product.description}
+                </p>
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Key Features</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Key Features
+                </h3>
                 <ul className="space-y-2">
-                  {product.features.map((feature, index) => (
+                  {productLocal.features.map((feature, index) => (
                     <li key={index} className="flex items-center text-gray-600">
                       <div className="w-2 h-2 bg-amber-600 rounded-full mr-3"></div>
                       {feature}
@@ -155,14 +228,18 @@ export default function ProductDetail() {
                 <div className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg">
                   <Truck className="w-6 h-6 text-green-600" />
                   <div>
-                    <p className="font-semibold text-green-800">Free Delivery</p>
+                    <p className="font-semibold text-green-800">
+                      Free Delivery
+                    </p>
                     <p className="text-sm text-green-600">Within Addis Ababa</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
                   <Shield className="w-6 h-6 text-blue-600" />
                   <div>
-                    <p className="font-semibold text-blue-800">2 Year Warranty</p>
+                    <p className="font-semibold text-blue-800">
+                      2 Year Warranty
+                    </p>
                     <p className="text-sm text-blue-600">Full coverage</p>
                   </div>
                 </div>
@@ -182,14 +259,23 @@ export default function ProductDetail() {
 
               {/* Specifications */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Specifications</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Specifications
+                </h3>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  {Object.entries(product.specifications).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-2 border-b border-gray-200 last:border-b-0">
-                      <span className="font-medium text-gray-700">{key}:</span>
-                      <span className="text-gray-600">{value}</span>
-                    </div>
-                  ))}
+                  {Object.entries(productLocal.specifications).map(
+                    ([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex justify-between py-2 border-b border-gray-200 last:border-b-0"
+                      >
+                        <span className="font-medium text-gray-700">
+                          {String(key)}:
+                        </span>
+                        <span className="text-gray-600">{String(value)}</span>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -200,7 +286,9 @@ export default function ProductDetail() {
       {/* Related Products */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Related Products</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            Related Products
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {relatedProducts.map((relatedProduct) => (
               <Link
@@ -214,8 +302,12 @@ export default function ProductDetail() {
                   className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                 />
                 <div className="p-4">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{relatedProduct.name}</h3>
-                  <span className="text-xl font-bold text-amber-600">{relatedProduct.price} Br</span>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    {relatedProduct.name}
+                  </h3>
+                  <span className="text-xl font-bold text-amber-600">
+                    {relatedProduct.price} Br
+                  </span>
                 </div>
               </Link>
             ))}
@@ -223,5 +315,5 @@ export default function ProductDetail() {
         </div>
       </section>
     </div>
-  )
+  );
 }
