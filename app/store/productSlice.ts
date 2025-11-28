@@ -1,6 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../lib/api";
+import Public_Api from "../../lib/publicApi";
 
+export interface User {
+  userName: string;
+  email: string;
+}
 interface Product {
   _id: string;
   title: string;
@@ -9,7 +14,7 @@ interface Product {
   thumbnailUrl: string;
   imagesUrl: [];
   category: string;
-  createdBy: string;
+  createdBy: User;
   createdAt: string;
 }
 
@@ -32,9 +37,8 @@ export const getProducts = createAsyncThunk(
   "products/getProducts",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/products/get"); // → GET /api/products
+      const response = await Public_Api.get("/products/get"); // → GET /api/products
 
-      // Backend should return: { success: true, products: [...] }
       return response.data; // ← This becomes action.payload
     } catch (err: any) {
       // Handle 401 → will be caught by interceptor (auto refresh)

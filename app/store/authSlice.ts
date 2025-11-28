@@ -1,6 +1,7 @@
 // features/auth/authSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../lib/api";
+import Public_Api from "../../lib/publicApi";
 
 const API_BASE = "http://localhost:4000/api";
 
@@ -10,11 +11,12 @@ interface User {
   userName: string;
   email: string;
   role: string;
+  accessToken: string;
 }
 
 interface AuthState {
   user: User | null;
-  token: string | null;
+  // token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   isLoggedOut: boolean;
@@ -23,7 +25,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token: null,
+  // token: null,
   isLoading: true,
   isAuthenticated: false,
   isLoggedOut: false,
@@ -40,7 +42,7 @@ export const login = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await api.post("/auth/login", credentials);
+      const response = await Public_Api.post("/auth/login", credentials);
       const { accessToken, user } = response.data;
 
       if (user.role !== "admin") {
@@ -59,7 +61,7 @@ export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      await api.post("/auth/logout");
+      await Public_Api.post("/auth/logout");
       return true;
     } catch (err: any) {
       console.warn("Backend logout failed:", err.message);
@@ -73,8 +75,8 @@ export const refreshToken = createAsyncThunk(
   "auth/refreshToken",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.post("/auth/refresh-token");
-      return response.data.accessToken; // ← Only token
+      const response = await Public_Api.post("/auth/refresh-token");
+      return response.data;
     } catch (err: any) {
       return rejectWithValue("Session expired");
     }
@@ -92,6 +94,7 @@ export const authSlice = createSlice({
         if (storedUser) {
           try {
             state.user = JSON.parse(storedUser);
+            // state.token = state.user?.accessToken || null;
           } catch {
             localStorage.removeItem("user");
           }
@@ -101,7 +104,7 @@ export const authSlice = createSlice({
     // ← ADD LOGOUT REDUCER
     logout: (state) => {
       state.user = null;
-      state.token = null;
+      // state.token = null;
       state.isAuthenticated = false;
       state.isLoading = false;
       state.isLoggedOut = true;
@@ -125,9 +128,14 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = true;
         state.isLoggedOut = false;
-        state.token = action.payload.accessToken;
-        state.user = action.payload.user;
-        localStorage.setItem("user", JSON.stringify(action.payload.user));
+        const mergedUser = {
+          ...action.payload.user,
+          accessToken: action.payload.accessToken,
+        };
+        state.user = mergedUser;
+        localStorage.setItem("user", JSON.stringify(mergedUser));
+
+        console.log(action.payload);
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
@@ -141,13 +149,21 @@ export const authSlice = createSlice({
       })
       .addCase(refreshToken.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.token = action.payload; // ← Only token
-        state.isAuthenticated = true;
-        // DO NOT update user — it stays from localStorage
+        if (action.payload?.user) {
+          const mergedUser = {
+            ...action.payload.user,
+            accessToken: action.payload.accessToken,
+          };
+          state.user = mergedUser;
+          state.isAuthenticated = true;
+          localStorage.setItem("user", JSON.stringify(mergedUser));
+        } else {
+          state.isAuthenticated = true;
+        }
       })
       .addCase(refreshToken.rejected, (state) => {
         state.isLoading = false;
-        state.token = null;
+        // state.token = null;
         state.user = null;
         state.isAuthenticated = false;
         localStorage.removeItem("user");
@@ -166,7 +182,7 @@ export const authSlice = createSlice({
         state.isLoading = false;
         // Force clear
         state.user = null;
-        state.token = null;
+        // state.token = null;
         state.isAuthenticated = false;
         localStorage.removeItem("user");
       });

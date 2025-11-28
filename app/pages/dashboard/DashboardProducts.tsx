@@ -7,66 +7,55 @@ import { Edit, Trash2, Plus, Search } from "lucide-react";
 import Toast from "@/app/components/Toast";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/app/store/store";
-
-interface Product {
-  id: string;
-  title: string;
-  price: number;
-  category: string;
-  status: "active" | "inactive";
-}
+import { getProducts } from "@/app/store/productSlice";
 
 export default function DashboardProducts() {
   const router = useRouter();
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: "1",
-      title: "Sofa M115",
-      price: 94900,
-      category: "Sofa",
-      status: "active",
-    },
-    {
-      id: "2",
-      title: "Bed B205",
-      price: 67500,
-      category: "Bed",
-      status: "active",
-    },
-    {
-      id: "3",
-      title: "Dining Set D340",
-      price: 125800,
-      category: "Dining Set",
-      status: "active",
-    },
-  ]);
+  const dispatch = useDispatch<AppDispatch>();
+
+  // GET DATA DIRECTLY FROM REDUX (BEST WAY!)
+  const { products, isLoading, error } = useSelector(
+    (state: RootState) => state.product
+  );
+
   const [searchTerm, setSearchTerm] = useState("");
   const [toast, setToast] = useState<{
     type: "success" | "error";
     message: string;
   } | null>(null);
 
+  // Fetch products on mount
   useEffect(() => {
-    // const user = localStorage.getItem("user");
-    if (!isAuthenticated) {
-      router.push("/login");
-    }
-  }, [router]);
+    dispatch(getProducts());
+  }, [dispatch]);
+
+  // Filter products (real-time)
+  const filteredProducts = products.filter(
+    (product: any) =>
+      product.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.category?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleDelete = (id: string) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      setProducts(products.filter((p) => p.id !== id));
+      // Optional: dispatch delete action
       setToast({ type: "success", message: "Product deleted successfully" });
     }
   };
 
-  const filteredProducts = products.filter(
-    (product) =>
-      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Show loading
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Loading products...
+      </div>
+    );
+  }
+
+  // Show error
+  if (error) {
+    return <div className="text-red-600 text-center">Error: {error}</div>;
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50 pt-16">
@@ -77,9 +66,9 @@ export default function DashboardProducts() {
           onClose={() => setToast(null)}
         />
       )}
+
       {/* <DashboardSidebar /> */}
 
-      {/* Main Content */}
       <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -99,96 +88,87 @@ export default function DashboardProducts() {
             </button>
           </div>
 
-          {/* Search Bar */}
+          {/* Search */}
           <div className="mb-6 relative">
             <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search products by name or category..."
+              placeholder="Search by title or category..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent"
             />
           </div>
 
-          {/* Products Table */}
+          {/* Table */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             {filteredProducts.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-gray-600 mb-4">No products found</p>
+              <div className="p-12 text-center">
+                <p className="text-gray-600 mb-6">No products found</p>
                 <button
                   onClick={() => router.push("/dashboard/products/add")}
-                  className="inline-flex items-center bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700"
+                  className="bg-amber-600 text-white px-6 py-3 rounded-lg hover:bg-amber-700"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create First Product
+                  <Plus className="w-5 h-5 inline mr-2" />
+                  Add Your First Product
                 </button>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
+                  <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                         Title
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                         Category
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                         Price
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                        Status
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                        Created By
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
-                    {filteredProducts.map((product) => (
-                      <tr
-                        key={product.id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                  <tbody className="divide-y divide-gray-200">
+                    {filteredProducts.map((product: any) => (
+                      <tr key={product._id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
                           {product.title}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600">
                           {product.category}
                         </td>
                         <td className="px-6 py-4 text-sm font-semibold text-amber-600">
-                          {product.price} Br
+                          {parseFloat(product.price || 0).toLocaleString()} Br
                         </td>
                         <td className="px-6 py-4 text-sm">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              product.status === "active"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {product.status}
-                          </span>
+                          {product.createdBy?.userName || "Unknown"}
                         </td>
-                        <td className="px-6 py-4 text-sm space-x-2 flex">
-                          <button
-                            onClick={() =>
-                              router.push(
-                                `/dashboard/products/edit/${product.id}`
-                              )
-                            }
-                            className="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(product.id)}
-                            className="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                        <td className="px-6 py-4 text-sm">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() =>
+                                router.push(
+                                  `/dashboard/products/edit/${product._id}`
+                                )
+                              }
+                              className="p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(product._id)}
+                              className="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

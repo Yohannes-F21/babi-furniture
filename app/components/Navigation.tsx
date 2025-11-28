@@ -17,8 +17,8 @@ export default function Navigation() {
   // const [user, setUser] = useState<any>(null);
   const [pastHero, setPastHero] = useState(false);
 
-  const { user } = useSelector((state: RootState) => state.auth);
-  // console.log(user);
+  const auth = useSelector((state: RootState) => state?.auth);
+  const user = auth?.user;
 
   const navLinks = [
     { name: "Home", path: "/" },

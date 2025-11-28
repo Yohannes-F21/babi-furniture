@@ -1,6 +1,4 @@
-// app/products/page.tsx   ← ONE FILE ONLY – FILTERING WORKS!
-
-"use client"; // ← First line – no comments before!
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";

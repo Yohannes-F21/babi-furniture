@@ -10,7 +10,6 @@ import {
   logout,
   setAuthReady,
 } from "./store/authSlice";
-import api, { initApi } from "@/lib/api";
 
 function InitializeAuth({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,21 +19,12 @@ function InitializeAuth({ children }: { children: React.ReactNode }) {
       // Step 1: Restore user from localStorage
       dispatch(restoreAuth());
 
-      // Step 2: Get current auth state
-      const auth = store.getState().auth;
+      // Step 2: Refresh token only when we already have an accessToken
+      const { user, isLoggedOut } = store.getState().auth;
+      const hasAccessToken = Boolean(user?.accessToken);
+      console.log("has access token:", hasAccessToken);
 
-      // Step 3: Initialize API (always — needed for interceptors)
-      initApi(
-        () => store.getState().auth,
-        async () => {
-          const result = await dispatch(refreshToken()).unwrap();
-          return result;
-        },
-        () => dispatch(logout())
-      );
-
-      // Step 4: Only try refresh if user exists & not explicitly logged out
-      if (auth.user && !auth.isLoggedOut) {
+      if (hasAccessToken && !isLoggedOut) {
         try {
           await dispatch(refreshToken()).unwrap();
         } catch (error) {

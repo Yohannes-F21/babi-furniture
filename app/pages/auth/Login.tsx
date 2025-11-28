@@ -24,7 +24,9 @@ export default function Login() {
     message: string;
   } | null>(null);
   const dispatch = useDispatch<AppDispatch>();
-  const { isLoading, error } = useSelector((state: RootState) => state.auth);
+  const authState = useSelector((state: RootState) => state?.auth);
+  const isLoading = authState?.isLoading ?? false;
+  const error = authState?.error;
 
   const {
     register,
