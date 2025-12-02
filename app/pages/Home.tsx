@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { ChevronRight, Star, Truck, Shield, Clock } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 export default function Home() {
   const [currentPromo, setCurrentPromo] = useState(0);
@@ -12,29 +14,33 @@ export default function Home() {
     "Two Year Warranty",
   ];
 
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "Sofa M115",
-      price: "94,900",
-      image: "/placeholder.svg?height=300&width=400",
-      category: "Sofa",
-    },
-    {
-      id: 2,
-      name: "Bed B205",
-      price: "67,500",
-      image: "/placeholder.svg?height=300&width=400",
-      category: "Bed",
-    },
-    {
-      id: 3,
-      name: "Dining Set D340",
-      price: "125,800",
-      image: "/placeholder.svg?height=300&width=400",
-      category: "Dining Set",
-    },
-  ];
+  const featuredProducts = useSelector((state: RootState) =>
+    state.product.products.filter((p) => p.isFeatured)
+  );
+
+  // const featuredProducts = [
+  //   {
+  //     id: 1,
+  //     name: "Sofa M115",
+  //     price: "94,900",
+  //     image: "/placeholder.svg?height=300&width=400",
+  //     category: "Sofa",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Bed B205",
+  //     price: "67,500",
+  //     image: "/placeholder.svg?height=300&width=400",
+  //     category: "Bed",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Dining Set D340",
+  //     price: "125,800",
+  //     image: "/placeholder.svg?height=300&width=400",
+  //     category: "Dining Set",
+  //   },
+  // ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -105,7 +111,7 @@ export default function Home() {
                 </div>
                 <div className="text-center">
                   <Clock className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-                  <p className="text-sm font-medium">7-10 Days</p>
+                  <p className="text-sm font-medium">1-2 Weeks</p>
                 </div>
               </div>
             </div>
@@ -187,14 +193,14 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredProducts.map((product) => (
               <Link
-                key={product.id}
-                href={`/products/${product.id}`}
+                key={product._id}
+                href={`/products/${product._id}`}
                 className="group bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 <div className="relative overflow-hidden">
                   <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
+                    src={product.thumbnailUrl || "/placeholder.svg"}
+                    alt={product.title}
                     className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute top-4 right-4 bg-amber-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -203,7 +209,7 @@ export default function Home() {
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {product.name}
+                    {product.title}
                   </h3>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-amber-600">
@@ -238,11 +244,11 @@ export default function Home() {
             </div>
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                19+ Years of Excellence
+                10+ Years of Excellence
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed">
-                Alpha Furniture Ethiopia has been crafting quality furniture for
-                over 19 years. We specialize in custom designs, offer free
+                Babi Furniture Ethiopia has been crafting quality furniture for
+                over 10 years. We specialize in custom designs, offer free
                 delivery within Addis Ababa, and provide a comprehensive
                 two-year warranty on all our products.
               </p>

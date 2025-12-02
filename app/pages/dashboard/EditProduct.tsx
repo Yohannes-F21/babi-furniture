@@ -146,6 +146,7 @@ export default function EditProduct() {
                   <option value="dining table">Dining Table</option>
                   <option value="dressing table">Dressing Table</option>
 
+                  <option value="closet">Closet</option>
                   <option value="cabinet">Cabinet</option>
                 </select>
               </div>

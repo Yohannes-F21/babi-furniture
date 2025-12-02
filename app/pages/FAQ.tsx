@@ -1,14 +1,18 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export default function FAQ() {
-  const [openItems, setOpenItems] = useState<number[]>([])
+  const [openItems, setOpenItems] = useState<number[]>([]);
 
   const toggleItem = (index: number) => {
-    setOpenItems((prev) => (prev.includes(index) ? prev.filter((item) => item !== index) : [...prev, index]))
-  }
+    setOpenItems((prev) =>
+      prev.includes(index)
+        ? prev.filter((item) => item !== index)
+        : [...prev, index]
+    );
+  };
 
   const faqs = [
     {
@@ -61,16 +65,19 @@ export default function FAQ() {
       answer:
         "Yes, our experienced design team can provide consultation services to help you choose the right furniture pieces for your space. We can advise on color coordination, space planning, and furniture arrangement to create a cohesive and functional interior design.",
     },
-  ]
+  ];
 
   return (
     <div className="pt-16">
       {/* Header */}
       <section className="bg-gradient-to-r from-amber-50 to-orange-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Frequently Asked Questions
+          </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Find answers to common questions about our furniture, services, and policies
+            Find answers to common questions about our furniture, services, and
+            policies
           </p>
         </div>
       </section>
@@ -80,13 +87,18 @@ export default function FAQ() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg overflow-hidden"
+              >
                 <button
                   onClick={() => toggleItem(index)}
                   className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition-colors duration-200"
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900 pr-4">{faq.question}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 pr-4">
+                      {faq.question}
+                    </h3>
                     {openItems.includes(index) ? (
                       <ChevronUp className="w-5 h-5 text-amber-600 flex-shrink-0" />
                     ) : (
@@ -97,7 +109,9 @@ export default function FAQ() {
 
                 {openItems.includes(index) && (
                   <div className="px-6 pb-4 bg-gray-50">
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                    <p className="text-gray-600 leading-relaxed">
+                      {faq.answer}
+                    </p>
                   </div>
                 )}
               </div>
@@ -106,19 +120,22 @@ export default function FAQ() {
 
           {/* Contact CTA */}
           <div className="mt-12 text-center p-8 bg-amber-50 rounded-lg">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Still have questions?</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Still have questions?
+            </h3>
             <p className="text-gray-600 mb-6">
-              Our team is here to help you with any additional questions or concerns.
+              Our team is here to help you with any additional questions or
+              concerns.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="tel:0979426642"
+                href="tel:0920244062"
                 className="bg-amber-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-700 transition-colors duration-300"
               >
-                Call Us: 0979 426642
+                Call Us: 0920244062
               </a>
               <a
-                href="mailto:info@alphafurniture.net"
+                href="mailto:hailegebralefantahun@gmail.com"
                 className="border-2 border-amber-600 text-amber-600 px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 hover:text-white transition-all duration-300"
               >
                 Email Us
@@ -128,5 +145,5 @@ export default function FAQ() {
         </div>
       </section>
     </div>
-  )
+  );
 }
