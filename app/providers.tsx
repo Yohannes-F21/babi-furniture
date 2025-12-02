@@ -10,6 +10,7 @@ import {
   logout,
   setAuthReady,
 } from "./store/authSlice";
+import { getProducts } from "./store/productSlice"; // ← ADD THIS
 
 function InitializeAuth({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -22,7 +23,6 @@ function InitializeAuth({ children }: { children: React.ReactNode }) {
       // Step 2: Refresh token only when we already have an accessToken
       const { user, isLoggedOut } = store.getState().auth;
       const hasAccessToken = Boolean(user?.accessToken);
-      console.log("has access token:", hasAccessToken);
 
       if (hasAccessToken && !isLoggedOut) {
         try {
@@ -34,6 +34,15 @@ function InitializeAuth({ children }: { children: React.ReactNode }) {
       } else {
         dispatch(setAuthReady());
       }
+
+      // ←←← THIS IS THE ONLY NEW PART (3 lines) ←←←
+      // Fetch products ONCE when the app starts
+      try {
+        await dispatch(getProducts()).unwrap();
+      } catch (err) {
+        console.log("Failed to load products on startup:", err);
+      }
+      // ←←← END OF NEW PART ←←←
     };
 
     initialize();

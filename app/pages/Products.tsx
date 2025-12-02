@@ -4,15 +4,21 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Star, Filter } from "lucide-react";
 import publicApi from "@/lib/publicApi";
+import { RootState } from "../store/store";
+import { useSelector } from "react-redux";
 
 // ──────────────────────────────────────────────────────────────
 // MAIN PAGE + DATA FETCHING + FILTERING (ALL IN ONE CLIENT COMPONENT)
 // ──────────────────────────────────────────────────────────────
 export default function ProductsPage() {
-  const [products, setProducts] = useState<any[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
+  const products = useSelector((state: RootState) => state.product.products);
+  useEffect(() => {
+    setFilteredProducts(products);
+    setLoading(false);
+  }, [products]);
 
   const categories = [
     "all",
@@ -23,23 +29,6 @@ export default function ProductsPage() {
     "dressing table",
     "cabinet",
   ];
-
-  // Fetch products once on mount
-  useEffect(() => {
-    publicApi
-      .get("/products/get")
-      .then((res) => {
-        const data = res.data.data || [];
-        setProducts(data);
-        setFilteredProducts(data);
-      })
-      .catch((err) => {
-        console.error("Failed to load products:", err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
 
   // Filter when category changes
   useEffect(() => {

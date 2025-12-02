@@ -5,34 +5,28 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Star, Truck, Shield, ArrowLeft, Heart, Share2 } from "lucide-react";
 import publicApi from "@/lib/publicApi";
+import { Root } from "postcss";
+import { RootState } from "../store/store";
 
 export default function ProductDetail() {
   const params = useParams();
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { useSelector } = require("react-redux");
   const id = params.id as string;
   console.log(id);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const allProducts = useSelector((state: RootState) => state.product.products);
+  const productFromStore = allProducts.find((p: any) => p._id === id);
+  // console.log(productFromStore);
   useEffect(() => {
-    if (!id) return;
-
-    publicApi
-      .get(`/products/get/${id}`)
-      .then((res) => {
-        const data = res.data.data;
-        console.log("Fetched product:", data);
-        setProduct(data);
-        setCurrentImageIndex(0); // Reset to first image
-      })
-      .catch((err) => {
-        console.error("Error:", err);
-        setProduct(null);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [id]);
+    if (productFromStore) {
+      setProduct(productFromStore);
+      setCurrentImageIndex(0);
+      setLoading(false); // Reset to first image
+    }
+  }, [productFromStore]);
 
   if (loading) return <div className="text-center py-20">Loading...</div>;
   if (!product)
@@ -77,28 +71,12 @@ export default function ProductDetail() {
       Delivery: "7-10 Days",
     },
   };
-
-  const relatedProducts = [
-    {
-      id: 2,
-      name: "Sofa S220",
-      price: "78,900",
-      image: "/placeholder.svg?height=200&width=250",
-    },
-    {
-      id: 3,
-      name: "Sofa S190",
-      price: "112,300",
-      image: "/placeholder.svg?height=200&width=250",
-    },
-    {
-      id: 4,
-      name: "Chair C105",
-      price: "25,400",
-      image: "/placeholder.svg?height=200&width=250",
-    },
-  ];
-
+  const relatedProducts = allProducts
+    .filter(
+      (p: any) => p.category === product.category && p._id !== product._id
+    )
+    .slice(0, 3);
+  console.log(relatedProducts);
   return (
     <div className="pt-16">
       {/* Breadcrumb */}
@@ -284,36 +262,38 @@ export default function ProductDetail() {
       </section>
 
       {/* Related Products */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">
-            Related Products
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {relatedProducts.map((relatedProduct) => (
-              <Link
-                key={relatedProduct.id}
-                href={`/products/${relatedProduct.id}`}
-                className="group bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                <img
-                  src={relatedProduct.image || "/placeholder.svg"}
-                  alt={relatedProduct.name}
-                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-                <div className="p-4">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    {relatedProduct.name}
-                  </h3>
-                  <span className="text-xl font-bold text-amber-600">
-                    {relatedProduct.price} Br
-                  </span>
-                </div>
-              </Link>
-            ))}
+      {relatedProducts.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
+              Related Products
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {relatedProducts.map((relatedProduct: any) => (
+                <Link
+                  key={relatedProduct.id}
+                  href={`/products/${relatedProduct.id}`}
+                  className="group bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  <img
+                    src={relatedProduct.thumbnailUrl || "/placeholder.svg"}
+                    alt={relatedProduct.title}
+                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      {relatedProduct.title}
+                    </h3>
+                    <span className="text-xl font-bold text-amber-600">
+                      {relatedProduct.price} Br
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

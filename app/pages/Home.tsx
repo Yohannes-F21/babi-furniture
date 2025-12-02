@@ -137,17 +137,17 @@ export default function Home() {
             {[
               {
                 name: "Sofas",
-                image: "/placeholder.svg?height=300&width=400",
+                image: "/hero3.jpeg",
                 count: "25+ Models",
               },
               {
                 name: "Beds",
-                image: "/placeholder.svg?height=300&width=400",
+                image: "/featured_bed_category.jpg",
                 count: "30+ Models",
               },
               {
-                name: "Dining Sets",
-                image: "/placeholder.svg?height=300&width=400",
+                name: "Closets",
+                image: "/featured_closet_category.jpg",
                 count: "20+ Models",
               },
             ].map((category, index) => (
@@ -161,7 +161,7 @@ export default function Home() {
                   alt={category.name}
                   className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-all duration-300"></div>
+                <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-10 transition-all duration-300"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                   <h3 className="text-2xl font-bold mb-2">{category.name}</h3>
                   <p className="text-amber-200">{category.count}</p>

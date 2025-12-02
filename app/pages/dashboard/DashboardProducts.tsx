@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DashboardSidebar from "@/app/components/DashboardSidebar";
+
 import { Edit, Trash2, Plus, Search } from "lucide-react";
 import Toast from "@/app/components/Toast";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/app/store/store";
 import { getProducts } from "@/app/store/productSlice";
+import DeleteConfirmButton from "@/app/components/DeleteConfirmButton";
 
 export default function DashboardProducts() {
   const router = useRouter();
@@ -24,10 +25,10 @@ export default function DashboardProducts() {
     message: string;
   } | null>(null);
 
-  // Fetch products on mount
-  useEffect(() => {
-    dispatch(getProducts());
-  }, [dispatch]);
+  // // Fetch products on mount
+  // useEffect(() => {
+  //   dispatch(getProducts());
+  // }, [dispatch]);
 
   // Filter products (real-time)
   const filteredProducts = products.filter(
@@ -35,13 +36,6 @@ export default function DashboardProducts() {
       product.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.category?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleDelete = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      // Optional: dispatch delete action
-      setToast({ type: "success", message: "Product deleted successfully" });
-    }
-  };
 
   // Show loading
   if (isLoading) {
@@ -155,19 +149,26 @@ export default function DashboardProducts() {
                             <button
                               onClick={() =>
                                 router.push(
-                                  `/dashboard/products/edit/${product._id}`
+                                  `/dashboard/products/${product._id}`
                                 )
                               }
                               className="p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
                             >
                               <Edit className="w-4 h-4" />
                             </button>
-                            <button
-                              onClick={() => handleDelete(product._id)}
-                              className="p-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <DeleteConfirmButton
+                              productId={product._id}
+                              productTitle={product.title}
+                              onDeleteSuccess={() => {
+                                // This will refetch fresh list after delete
+                                dispatch(getProducts());
+                              }}
+                              setToast={setToast}
+                              onDeleteComplete={() => {
+                                // Force a state update to re-render table after any delete attempt
+                                setSearchTerm((term) => term);
+                              }}
+                            />
                           </div>
                         </td>
                       </tr>
