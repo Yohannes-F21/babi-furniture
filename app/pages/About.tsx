@@ -4,7 +4,7 @@ export default function About() {
   return (
     <div className="pt-16">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-amber-50 to-orange-50 py-16">
+      <section className="bg-gradient-to-r from-amber-50 to-orange-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             About Babi Furniture
@@ -47,7 +47,7 @@ export default function About() {
             </div>
             <div>
               <img
-                src="/placeholder.svg?height=500&width=600"
+                src="/sofa2.jpg?height=500&width=600"
                 alt="Babi Furniture Workshop"
                 className="rounded-lg shadow-lg w-full h-auto"
               />
@@ -122,9 +122,9 @@ export default function About() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <img
-                src="/placeholder.svg?height=500&width=600"
+                src="/sofa3.jpg?height=500&width=600"
                 alt="Custom Furniture Design"
-                className="rounded-lg shadow-lg w-full h-auto"
+                className="rounded-lg shadow-lg w-full h-auto md:h-[600px]"
               />
             </div>
             <div>

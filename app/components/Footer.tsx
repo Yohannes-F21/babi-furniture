@@ -110,6 +110,11 @@ export default function Footer() {
           <p className="text-gray-400">
             © 2025 Babi Furniture Ethiopia. All rights reserved.
           </p>
+          <p className="text-gray-300">
+            Designed by Yohannes Fantahun (Web Developer)
+          </p>
+          <p className="text-gray-300">email: yohannesfantahun.m@gmail.com</p>
+          <p className="text-gray-300">phone: +251910594289</p>
         </div>
       </div>
     </footer>

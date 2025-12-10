@@ -6,9 +6,12 @@ import Footer from "./components/Footer";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Babi Furniture Ethiopia - Premium Furniture Store",
+  title: "Babi Furniture Ethiopia",
   description:
-    "Quality furniture with 19+ years of experience, free delivery, and 2-year warranty",
+    "Quality furniture with 10+ years of experience, free delivery, and 2-year warranty",
+  icons: {
+    icon: "/logo4.png",
+  },
 };
 
 export default function RootLayout({

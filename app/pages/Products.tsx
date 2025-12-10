@@ -15,7 +15,12 @@ export default function ProductsPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
   const products = useSelector((state: RootState) => state.product.products);
+  const isProductsEmpty = products.length === 0;
   useEffect(() => {
+    if (isProductsEmpty) {
+      setLoading(false);
+      return;
+    }
     setFilteredProducts(products);
     setLoading(false);
   }, [products]);
@@ -48,7 +53,7 @@ export default function ProductsPage() {
   return (
     <div className="pt-16">
       {/* Header */}
-      <section className="bg-gradient-to-r from-amber-50 to-orange-50 py-16">
+      <section className="bg-gradient-to-r from-amber-50 to-orange-50 py-14">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Our Products
@@ -97,6 +102,17 @@ export default function ProductsPage() {
           </section>
 
           {/* Products Grid */}
+          {isProductsEmpty && (
+            <div className="py-16 bg-gray-50">
+              <div className="max-w-7xl mx-auto px-4">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-amber-600">
+                    No product found!!!
+                  </h2>
+                </div>
+              </div>
+            </div>
+          )}
           <section className="py-16 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">

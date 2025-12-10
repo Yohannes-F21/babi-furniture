@@ -59,15 +59,22 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.path}
-                className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-amber-600 transition-colors duration-200"
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.path;
+              return (
+                <Link
+                  key={link.name}
+                  href={link.path}
+                  className={`px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                    isActive
+                      ? "text-amber-600 font-bold "
+                      : "text-gray-700 hover:text-amber-600"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Auth Section */}

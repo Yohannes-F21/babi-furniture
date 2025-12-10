@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { RootState } from "../store/store";
+import { ThreeDot } from "react-loading-indicators";
 
 export default function ProtectedRoute({
   children,
@@ -25,7 +26,13 @@ export default function ProtectedRoute({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen bg-white">
-        <div className="text-xl">Checking session...</div>
+        {/* <div className="text-xl">Checking session...</div> */}
+        <ThreeDot
+          color="#d97706"
+          size="large"
+          text="Checking session"
+          textColor=""
+        />
       </div>
     );
   }
@@ -33,7 +40,13 @@ export default function ProtectedRoute({
   if (!isAuthenticated || isLoggedOut) {
     return (
       <div className="flex justify-center items-center h-screen bg-white">
-        <div className="text-xl">Redirecting to login...</div>
+        {/* <div className="text-xl">Redirecting to login...</div> */}
+        <ThreeDot
+          color="#d97706"
+          size="large"
+          text="Redirecting to login"
+          textColor=""
+        />
       </div>
     );
   }

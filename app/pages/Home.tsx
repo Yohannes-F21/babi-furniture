@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { ChevronRight, Star, Truck, Shield, Clock } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -14,33 +14,12 @@ export default function Home() {
     "Two Year Warranty",
   ];
 
-  const featuredProducts = useSelector((state: RootState) =>
-    state.product.products.filter((p) => p.isFeatured)
+  const products = useSelector((state: RootState) => state.product.products);
+  const featuredProducts = useMemo(
+    () => products.filter((p) => p.isFeatured),
+    [products]
   );
-
-  // const featuredProducts = [
-  //   {
-  //     id: 1,
-  //     name: "Sofa M115",
-  //     price: "94,900",
-  //     image: "/placeholder.svg?height=300&width=400",
-  //     category: "Sofa",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Bed B205",
-  //     price: "67,500",
-  //     image: "/placeholder.svg?height=300&width=400",
-  //     category: "Bed",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Dining Set D340",
-  //     price: "125,800",
-  //     image: "/placeholder.svg?height=300&width=400",
-  //     category: "Dining Set",
-  //   },
-  // ];
+  const isFeaturedProducts = featuredProducts.length > 0;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -179,57 +158,60 @@ export default function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Featured Products
-            </h2>
-            <p className="text-xl text-gray-600">
-              Our most popular furniture pieces
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => (
-              <Link
-                key={product._id}
-                href={`/products/${product._id}`}
-                className="group bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={product.thumbnailUrl || "/placeholder.svg"}
-                    alt={product.title}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute top-4 right-4 bg-amber-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    {product.category}
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {product.title}
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-amber-600">
-                      {product.price} Br
-                    </span>
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className="w-4 h-4 fill-amber-400 text-amber-400"
-                        />
-                      ))}
+      {isFeaturedProducts && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Featured Products
+              </h2>
+              <p className="text-xl text-gray-600">
+                Our most popular furniture pieces
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {featuredProducts.map((product) => (
+                <Link
+                  key={product._id}
+                  href={`/products/${product._id}`}
+                  className="group bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={product.thumbnailUrl || "/placeholder.svg"}
+                      alt={product.title}
+                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute top-4 right-4 bg-amber-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      {product.category}
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {product.title}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-amber-600">
+                        {product.price} Br
+                      </span>
+                      <div className="flex items-center">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className="w-4 h-4 fill-amber-400 text-amber-400"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* About Snippet */}
       <section className="py-16 bg-white">
@@ -237,9 +219,9 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <img
-                src="/placeholder.svg?height=400&width=600"
+                src="/sofa1.jpg?height=400&width=600"
                 alt="Alpha Furniture Workshop"
-                className="rounded-lg shadow-lg w-full h-auto"
+                className="rounded-lg shadow-lg w-full h-auto md:h-[600px]"
               />
             </div>
             <div className="space-y-6">
